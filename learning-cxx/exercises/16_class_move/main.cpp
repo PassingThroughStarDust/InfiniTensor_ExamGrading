@@ -15,22 +15,36 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity): cache(new size_t[capacity]), cached(capacity) {}
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci &&d) noexcept {
+        cache = d.cache;
+        cached = d.cached;
+        d.cache = NULL;
+    }
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci &&d) noexcept {
+        if (cache != d.cache) {
+            cache = d.cache;     
+            cached = d.cached;
+        }
+        return *this;
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+        cache[0] = 0;
+        cache[1] = 1;
+        for (int j = 2; j <= i; ++ j) {
+            cache[j] = cache[j - 1] + cache[j - 2];
         }
         return cache[i];
     }
@@ -53,6 +67,7 @@ int main(int argc, char **argv) {
 
     DynFibonacci const fib_ = std::move(fib);
     ASSERT(!fib.is_alive(), "Object moved");
+    // std::cout << fib_[10] << std::endl;
     ASSERT(fib_[10] == 55, "fibonacci(10) should be 55");
 
     DynFibonacci fib0(6);
